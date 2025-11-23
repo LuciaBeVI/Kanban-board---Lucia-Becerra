@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Box } from "@mui/material";
+import { Column } from "./dashboard/components/organisms/Column";
+import { TaskModal } from "./dashboard/components/molecules/TaskModal";
 
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Task {
+  title: string;
+  assignee: string;
+  status: "Backlog" | "In Progress" | "QA" | "Done";
 }
 
-export default App
+function App() {
+  const columns = ["Backlog", "In Progress", "QA", "Done"];
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const handleAddTask = (task: { title: string; assignee: string }) => {
+    setTasks([...tasks, { ...task, status: "Backlog" }]);
+  };
+
+  return (
+    <Box sx={{ p: 4, background: "#f5f5f5", minHeight: "100vh" }}>
+      <TaskModal onAddTask={handleAddTask} />
+
+      <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+        {columns.map((col) => (
+          <Column
+            key={col}
+            name={col}
+            tasks={tasks.filter((t) => t.status === col)}
+          />
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+export default App;
