@@ -1,7 +1,16 @@
-import type { TaskStatus } from "../components/types";
+import { Status, Role } from "../types/types";
 
-export const canMove = (role: string, from: TaskStatus, to: TaskStatus) => {
-  if (role === "Developer") return (from === "backlog" && to === "in-progress") || (from === "in-progress" && to === "qa");
-  if (role === "QA") return from === "qa" && to === "done";
+export const canMoveTask = (role: Role, from: Status, to: Status): boolean => {
+  if (from === to) return true;
+  
+  if (role === "Developer") {
+    if (from === "backlog" && to === "in-progress") return true;
+    if (from === "in-progress" && to === "qa") return true;
+  }
+  
+  if (role === "QA") {
+    if (from === "qa" && to === "done") return true;
+  }
+
   return false;
 };
