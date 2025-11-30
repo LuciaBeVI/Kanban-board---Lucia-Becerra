@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Box, TextField, MenuItem, Button, Typography } from "@mui/material";
+import { Modal, Box, TextField, MenuItem, Button, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import type { Task, Role } from "../../types/types";
-
 
 interface TaskModalProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (title: string, desc: string, assignee: Role) => void;
+  onCreate: (title: string, desc: string, assignee: Role, storyPoints: number) => void;
   onUpdate: (id: string, partial: Partial<Task>) => void;
   taskToEdit?: Task;
 }
@@ -15,11 +14,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
   const [title, setTitle] = useState(taskToEdit?.title || "");
   const [desc, setDesc] = useState(taskToEdit?.description || "");
   const [assignee, setAssignee] = useState<Role>(taskToEdit?.assignee || "Developer");
+  const [points, setPoints] = useState<number>(taskToEdit?.storyPoints || 1);
   
   const isEditing = !!taskToEdit;
 
   useEffect(() => {
     if (taskToEdit) {
+      setPoints(taskToEdit.storyPoints || 1);
       setTitle(taskToEdit.title);
       setDesc(taskToEdit.description || "");
       setAssignee(taskToEdit.assignee);
@@ -27,6 +28,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
       setTitle("");
       setDesc("");
       setAssignee("Developer");
+      setPoints(1);
     }
   }, [taskToEdit, open]);
 
@@ -38,9 +40,10 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
         title: title.trim(),
         description: desc.trim(),
         assignee,
+        storyPoints: points,
       });
     } else {
-      onCreate(title.trim(), desc.trim(), assignee);
+      onCreate(title.trim(), desc.trim(), assignee, points);
     }
 
     onClose();
@@ -61,11 +64,19 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
           <MenuItem value="QA">QA</MenuItem>
         </TextField>
         
-        {isEditing && taskToEdit && (
-            <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
-                Estado actual: {taskToEdit.status.toUpperCase()}
-            </Typography>
-        )}
+        <Typography variant="caption" display="block" sx={{ mb: 1 }}>Puntos de Historia (Complejidad)</Typography>
+        <ToggleButtonGroup
+          value={points}
+          exclusive
+          onChange={(e, newPoints) => newPoints && setPoints(newPoints)}
+          aria-label="story points"
+          size="small"
+          sx={{ mb: 3, display: 'flex', flexWrap: 'wrap' }}
+        >
+          {[1, 2, 3, 5, 8, 13].map((p) => (
+            <ToggleButton key={p} value={p} sx={{ flex: 1 }}>{p}</ToggleButton>
+          ))}
+        </ToggleButtonGroup>
 
         <Button variant="contained" onClick={submit} fullWidth disabled={!title.trim()}>
           {isEditing ? "Guardar Cambios" : "Crear Tarea"}

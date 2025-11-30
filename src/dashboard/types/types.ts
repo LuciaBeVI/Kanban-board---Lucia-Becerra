@@ -7,5 +7,7 @@ export interface Task {
   description?: string;
   assignee: Role;
   status: Status;
+  storyPoints?: number;
   createdAt: string;
+  isArchived?: boolean;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, Typography, useTheme, Box } from "@mui/material";
+import { Card, CardContent, Typography, useTheme, Box, Avatar } from "@mui/material";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Task } from "../../types/types";
@@ -19,9 +19,9 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
 
   const getCardColor = () => {
     if (task.assignee === "Developer") {
-        return isDark ? "#0d47a1" : "#e8f2ff"; 
+        return isDark ? "#180e27ff" : "#f0e4eaff"; 
     } else {
-        return isDark ? "#4a148c" : "#f5e8ff";
+        return isDark ? "#13152a" : "#f3eff5";
     }
   };
 
@@ -50,7 +50,7 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
               alignItems: 'flex-start',
               p: 1.5,
               cursor: 'grab', 
-              bgcolor: isDark ? '#364047' : '#bae2f1ff', 
+              bgcolor: isDark ? '#2b1224' : '#d5c6e0', 
               borderBottom: '1px solid',
               borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
           }}
@@ -74,13 +74,45 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
           {task.description || "Sin descripción"}
         </Typography>
         
-        <Typography 
-            variant="caption" 
-            display="block" 
-            sx={{ mt: 1, color: isDark ? "#90caf9" : "text.secondary", opacity: 0.8 }}
-        >
-          {task.assignee} • {new Date(task.createdAt).toLocaleDateString()}
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="end" mt={1}>
+            
+            <Box>
+                <Typography 
+                    variant="caption" 
+                    display="block" 
+                    sx={{ color: isDark ? "#f3f9feff" : "text.secondary", opacity: 0.8, mb: 0.5 }}
+                >
+                  {task.assignee} • {new Date(task.createdAt).toLocaleDateString()}
+                </Typography>
+
+                {task.storyPoints && (
+                    <Box sx={{ 
+                        bgcolor: isDark ? "rgba(255, 255, 255, 0.15)" : "#dad9d9ff", 
+                        borderRadius: "50%", 
+                        width: 24, 
+                        height: 24, 
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "center",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        color: isDark ? "#fff" : "#333"
+                    }}>
+                        {task.storyPoints}
+                    </Box>
+                )}
+            </Box>
+
+            <Avatar sx={{ 
+                width: 24, 
+                height: 24, 
+                fontSize: 12, 
+                bgcolor: task.assignee === "Developer" ? "secondary.main" : "primary.main" 
+            }}>
+                {task.assignee === "Developer" ? "J" : "P"}
+            </Avatar>
+
+        </Box>
       </CardContent>
     </Card>
   );

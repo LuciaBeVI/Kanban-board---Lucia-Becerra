@@ -6,8 +6,8 @@ interface Props {
   onClick?: () => void;
 }
 
-export const ButtonAtom = ({ text, onClick }: Props) => (
-  <Button variant="contained" onClick={onClick}>
+export const ButtonAtom = ({ text, onClick, ...props }: Props) => (
+  <Button variant="contained" onClick={onClick} {...props}>
     {text}
   </Button>
 );

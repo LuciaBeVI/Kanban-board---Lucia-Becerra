@@ -12,6 +12,10 @@ import { canMoveTask } from "../../services/roleService";
 import { TaskCard } from "../molecules/TaskCard";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import ArchiveIcon from '@mui/icons-material/Archive';
+import HistoryIcon from '@mui/icons-material/History';
+import { HistoryModal } from "../molecules/HistoryModal";
+import { Avatar, Select, MenuItem, ListItemText, ListItemAvatar } from "@mui/material";
 
 const STATUSES: Status[] = ["backlog", "in-progress", "qa", "done"];
 
@@ -23,14 +27,14 @@ interface KanbanPageProps {
 }
 
 export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleTheme }) => {
-  const { tasks, addTask, updateTask, moveTask } = useTasks();
+  const { tasks, archivedTasks, addTask, updateTask, moveTask, archiveCompleted, restoreTask } = useTasks();
 
   const [editingTask, setEditingTask] = useState<TaskEditState>(undefined); 
   const [currentUserRole, setCurrentUserRole] = useState<Role>("Developer");
   const [modalOpen, setModalOpen] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
-  
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState(""); 
@@ -50,13 +54,14 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
     setModalOpen(true);
   };
 
-  const handleCreateTask = (title: string, desc: string, assignee: Role) => {
+  const handleCreateTask = (title: string, desc: string, assignee: Role, storyPoints: number) => {
     const newTask: Task = {
         id: crypto.randomUUID(),
         title,
         description: desc,
         assignee,
         status: "backlog",
+        storyPoints, 
         createdAt: new Date().toISOString(),
       };
       addTask(newTask);
@@ -72,26 +77,19 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveDragId(null);
     if (!over) return;
-
     const activeId = active.id as string;
     const overId = over.id as string;
-
     if (activeId === overId) return;
 
     const activeTask = tasks.find((t) => t.id === activeId);
     const overTask = tasks.find((t) => t.id === overId);
-
     if (!activeTask) return;
 
     let newStatus: Status = activeTask.status;
@@ -113,11 +111,17 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
     }
   };
 
+  const handleArchiveSprint = () => {
+    if (confirm("¿Finalizar Sprint? Las tareas 'Done' se moverán al historial.")) {
+      archiveCompleted();
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh", bgcolor: "background.default", transition: "background-color 0.3s ease" }}>
       
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
-        <Typography variant="h4" fontWeight="bold" color="primary">
+        <Typography variant="h4" fontWeight="bold" color="secondary">
           Tablero Kanban
         </Typography>
         
@@ -129,19 +133,51 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
               </IconButton>
             </Tooltip>
 
+            <Tooltip title="Ver Historial de Tareas">
+                <IconButton onClick={() => setHistoryOpen(true)}>
+                  <HistoryIcon />
+                </IconButton>
+            </Tooltip>
+
             <Box sx={{ width: "1px", height: "24px", bgcolor: "divider" }} />
 
             <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="body2" color="text.secondary">Rol:</Typography>
-                <FormControlLabel
-                    control={<Switch checked={currentUserRole === "QA"} onChange={() => setCurrentUserRole(currentUserRole === "Developer" ? "QA" : "Developer")} />}
-                    label={<Chip label={currentUserRole} size="small" color={currentUserRole === "Developer" ? "primary" : "secondary"} />}
-                />
+                <Typography variant="body2" color="text.secondary">Usuario:</Typography>
+                <Select
+                    value={currentUserRole}
+                    onChange={(e) => setCurrentUserRole(e.target.value as Role)}
+                    size="small"
+                    variant="outlined"
+                    sx={{ height: 40, minWidth: 140, bgcolor: "background.paper" }}
+                    renderValue={(selected) => (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Avatar sx={{ width: 24, height: 24, fontSize: 12, bgcolor: selected === "Developer" ? "secondary.main" : "primary.main" }}>
+                                {selected === "Developer" ? "J" : "P"}
+                            </Avatar>
+                            <Typography variant="body2">{selected === "Developer" ? "Jane (Dev)" : "Patrick (QA)"}</Typography>
+                        </Box>
+                    )}
+                >
+                    <MenuItem value="Developer">
+                        <ListItemAvatar><Avatar sx={{ width: 24, height: 24, fontSize: 12, bgcolor: "secondary.main" }}>J</Avatar></ListItemAvatar>
+                        <ListItemText primary="Jane" secondary="Developer" />
+                    </MenuItem>
+                    <MenuItem value="QA">
+                        <ListItemAvatar><Avatar sx={{ width: 24, height: 24, fontSize: 12, bgcolor: "primary.main" }}>P</Avatar></ListItemAvatar>
+                        <ListItemText primary="Patrick" secondary="QA Tester" />
+                    </MenuItem>
+                </Select>
             </Box>
 
              <Box sx={{ width: "1px", height: "24px", bgcolor: "divider" }} />
 
-            <ButtonAtom text="+ Nueva Tarea" onClick={() => setModalOpen(true)} />
+            <Tooltip title="Archivar tareas completadas (Finalizar Sprint)">
+                <IconButton onClick={handleArchiveSprint} color="blueGrey" sx={{ border: "1px solid", borderColor: "blueGrey.main" }}>
+                  <ArchiveIcon />
+                </IconButton>
+            </Tooltip>
+
+            <ButtonAtom text="+ Nueva Tarea" onClick={() => setModalOpen(true)} color="info"/>
         </Box>
       </Box>
 
@@ -190,6 +226,13 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
         onCreate={handleCreateTask}
         onUpdate={updateTask}
         taskToEdit={editingTask}
+      />
+
+      <HistoryModal 
+        open={historyOpen} 
+        onClose={() => setHistoryOpen(false)} 
+        archivedTasks={archivedTasks} 
+        onRestore={restoreTask}
       />
 
       <Snackbar open={!!errorMsg} autoHideDuration={4000} onClose={() => setErrorMsg(null)}>
