@@ -1,10 +1,9 @@
-import React from 'react'; // Necesario en algunos entornos de test
+import React from 'react'; 
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { TaskCard } from '../../../dashboard/components/molecules/TaskCard';
 import { Task } from '../../../dashboard/types/types';
 
-// Mock de dnd-kit porque usa referencias al DOM que no existen fácilmente en test básico
 vi.mock('@dnd-kit/sortable', () => ({
   useSortable: () => ({
     attributes: {},

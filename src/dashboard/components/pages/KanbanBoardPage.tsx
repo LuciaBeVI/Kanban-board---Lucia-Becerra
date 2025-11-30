@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Box, Typography, Container, Chip, Switch, FormControlLabel, IconButton, Tooltip } from "@mui/material";
 import { DndContext, DragEndEvent, closestCorners, DragOverlay, DragStartEvent } from "@dnd-kit/core";
-import { Status, Role } from "../../types/types";
+import { Task, Status, Role } from "../../types/types";
 import { useTasks } from "../../hooks/useTasks";
 import { Column } from "../organisms/Column";
 import { TaskModal } from "../molecules/TaskModal";
@@ -13,16 +13,20 @@ import { TaskCard } from "../molecules/TaskCard";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
-
 const STATUSES: Status[] = ["backlog", "in-progress", "qa", "done"];
+
+type TaskEditState = Task | undefined; 
 
 interface KanbanPageProps {
   isDarkMode: boolean;
   toggleTheme: () => void;
 }
 
+
 export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleTheme }) => {
   const { tasks, addTask, updateTask } = useTasks();
+
+  const [editingTask, setEditingTask] = useState<TaskEditState>(undefined); 
   
   const [currentUserRole, setCurrentUserRole] = useState<Role>("Developer");
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,6 +44,29 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [tasks, search, roleFilter, statusFilter]);
+
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setModalOpen(true);
+  };
+
+  const handleCreateTask = (title: string, desc: string, assignee: Role) => {
+    const newTask: Task = {
+        id: crypto.randomUUID(),
+        title,
+        description: desc,
+        assignee,
+        status: "backlog",
+        createdAt: new Date().toISOString(),
+      };
+      addTask(newTask);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingTask(undefined);
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveDragId(event.active.id as string);
@@ -74,7 +101,6 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh", bgcolor: "background.default", transition: "background-color 0.3s ease" }}>
       
-      {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
         <Typography variant="h4" fontWeight="bold" color="primary">
           Tablero Kanban
@@ -123,15 +149,28 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
       <DndContext collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <Box display="grid" gridTemplateColumns={{ xs: "1fr", md: "repeat(4, 1fr)" }} gap={2} alignItems="start">
           {STATUSES.map((status) => (
-            <Column key={status} status={status} tasks={filteredTasks.filter((t) => t.status === status)} />
+            <Column 
+                key={status} 
+                status={status} 
+                tasks={filteredTasks.filter((t) => t.status === status)} 
+                onClickTask={handleEditTask}
+            />
           ))}
         </Box>
         <DragOverlay>
-            {activeDragId ? <Box sx={{ transform: "rotate(3deg)", opacity: 0.8 }}><TaskCard task={tasks.find(t => t.id === activeDragId)!} /></Box> : null}
+            {activeDragId ? <Box sx={{ transform: "rotate(3deg)", opacity: 0.8 }}><TaskCard task={tasks.find(t => t.id === activeDragId)!} onClick={function (task: Task): void {
+            throw new Error("Function not implemented.");
+          } } /></Box> : null}
         </DragOverlay>
       </DndContext>
 
-      <TaskModal open={modalOpen} onClose={() => setModalOpen(false)} onCreate={addTask} />
+      <TaskModal 
+      open={modalOpen} 
+      onClose={handleCloseModal}
+      onCreate={handleCreateTask}
+      onUpdate={updateTask}
+      taskToEdit={editingTask}
+    />
     </Container>
   );
 };

@@ -9,9 +9,10 @@ import { TaskCard } from "../molecules/TaskCard";
 interface ColumnProps {
   status: Status;
   tasks: Task[];
+  onClickTask: (task: Task) => void;
 }
 
-export const Column: React.FC<ColumnProps> = ({ status, tasks }) => {
+export const Column: React.FC<ColumnProps> = ({ status, tasks, onClickTask }) => { 
   const { setNodeRef } = useDroppable({ id: status });
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -49,7 +50,11 @@ export const Column: React.FC<ColumnProps> = ({ status, tasks }) => {
 
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard 
+              key={task.id} 
+              task={task} 
+              onClick={onClickTask}
+            />
           ))}
         </SortableContext>
         

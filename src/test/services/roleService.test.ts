@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { canMoveTask } from '../../dashboard/services/roleService';
 
 describe('Role Logic - canMoveTask', () => {
-  // --- DEVELOPER RULES ---
   describe('Role: Developer', () => {
     it('should allow moving from Backlog to In-Progress', () => {
       expect(canMoveTask('Developer', 'backlog', 'in-progress')).toBe(true);
@@ -21,7 +20,6 @@ describe('Role Logic - canMoveTask', () => {
     });
   });
 
-  // --- QA RULES ---
   describe('Role: QA', () => {
     it('should allow moving from QA to Done', () => {
       expect(canMoveTask('QA', 'qa', 'done')).toBe(true);
@@ -36,7 +34,6 @@ describe('Role Logic - canMoveTask', () => {
     });
   });
 
-  // --- GENERAL RULES ---
   describe('General Rules', () => {
     it('should allow dropping in the same column (reordering)', () => {
       expect(canMoveTask('Developer', 'in-progress', 'in-progress')).toBe(true);

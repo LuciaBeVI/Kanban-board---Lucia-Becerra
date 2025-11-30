@@ -4,7 +4,6 @@ import { useTasks } from '../../dashboard/hooks/useTasks';
 import { Task } from '../../dashboard/types/types';
 
 describe('useTasks Hook', () => {
-  // Limpiar localStorage antes de cada test
   beforeEach(() => {
     window.localStorage.clear();
   });
@@ -25,7 +24,6 @@ describe('useTasks Hook', () => {
       createdAt: new Date().toISOString(),
     };
 
-    // Act: Ejecutamos la función que modifica el estado
     act(() => {
       result.current.addTask(newTask);
     });
@@ -49,7 +47,6 @@ describe('useTasks Hook', () => {
       result.current.addTask(newTask);
     });
 
-    // Actualizamos status
     act(() => {
       result.current.updateTask('1', { status: 'in-progress' });
     });
