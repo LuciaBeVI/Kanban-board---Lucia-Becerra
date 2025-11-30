@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { Box, Typography, Container, Chip, Switch, FormControlLabel, IconButton, Tooltip } from "@mui/material";
-import { DndContext, DragEndEvent, closestCorners, DragOverlay, DragStartEvent } from "@dnd-kit/core";
+import { Snackbar, Alert, Box, Typography, Container, Chip, Switch, FormControlLabel, IconButton, Tooltip } from "@mui/material";
+import { useSensor, useSensors, PointerSensor, DndContext, DragEndEvent, closestCorners, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import { Task, Status, Role } from "../../types/types";
 import { useTasks } from "../../hooks/useTasks";
 import { Column } from "../organisms/Column";
@@ -22,15 +22,15 @@ interface KanbanPageProps {
   toggleTheme: () => void;
 }
 
-
 export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleTheme }) => {
-  const { tasks, addTask, updateTask } = useTasks();
+  const { tasks, addTask, updateTask, moveTask } = useTasks();
 
   const [editingTask, setEditingTask] = useState<TaskEditState>(undefined); 
-  
   const [currentUserRole, setCurrentUserRole] = useState<Role>("Developer");
   const [modalOpen, setModalOpen] = useState(false);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState(""); 
@@ -44,7 +44,6 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [tasks, search, roleFilter, statusFilter]);
-
 
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
@@ -72,30 +71,46 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
     setActiveDragId(event.active.id as string);
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveDragId(null);
     if (!over) return;
 
-    const taskId = active.id as string;
-    const currentTask = tasks.find((t) => t.id === taskId);
-    if (!currentTask) return;
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    let newStatus: Status | undefined;
-    if (STATUSES.includes(over.id as Status)) {
-      newStatus = over.id as Status;
+    if (activeId === overId) return;
+
+    const activeTask = tasks.find((t) => t.id === activeId);
+    const overTask = tasks.find((t) => t.id === overId);
+
+    if (!activeTask) return;
+
+    let newStatus: Status = activeTask.status;
+
+    if (STATUSES.includes(overId as Status)) {
+      newStatus = overId as Status;
+    } else if (overTask) {
+      newStatus = overTask.status;
+    }
+
+    if (activeTask.status !== newStatus) {
+        if (!canMoveTask(currentUserRole, activeTask.status, newStatus)) {
+            setErrorMsg(`Acción bloqueada: ${currentUserRole} no puede mover de ${activeTask.status} a ${newStatus}.`);
+            return;
+        }
+        updateTask(activeId, { status: newStatus });
     } else {
-      const overTask = tasks.find((t) => t.id === over.id);
-      if (overTask) newStatus = overTask.status;
+        moveTask(activeId, overId);
     }
-
-    if (!newStatus || newStatus === currentTask.status) return;
-
-    if (!canMoveTask(currentUserRole, currentTask.status, newStatus)) {
-      alert(`Acción bloqueada: Como ${currentUserRole} no puede mover de ${currentTask.status} a ${newStatus}.`);
-      return;
-    }
-    updateTask(taskId, { status: newStatus });
   };
 
   return (
@@ -145,8 +160,8 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
             </Box>
         </Box>
       </Box>
-
-      <DndContext collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      
+      <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <Box display="grid" gridTemplateColumns={{ xs: "1fr", md: "repeat(4, 1fr)" }} gap={2} alignItems="start">
           {STATUSES.map((status) => (
             <Column 
@@ -158,19 +173,30 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
           ))}
         </Box>
         <DragOverlay>
-            {activeDragId ? <Box sx={{ transform: "rotate(3deg)", opacity: 0.8 }}><TaskCard task={tasks.find(t => t.id === activeDragId)!} onClick={function (task: Task): void {
-            throw new Error("Function not implemented.");
-          } } /></Box> : null}
+            {activeDragId ? (
+                <Box sx={{ transform: "rotate(3deg)", opacity: 0.8 }}>
+                    <TaskCard 
+                        task={tasks.find(t => t.id === activeDragId)!} 
+                        onClick={() => {}} 
+                    />
+                </Box>
+            ) : null}
         </DragOverlay>
       </DndContext>
 
       <TaskModal 
-      open={modalOpen} 
-      onClose={handleCloseModal}
-      onCreate={handleCreateTask}
-      onUpdate={updateTask}
-      taskToEdit={editingTask}
-    />
+        open={modalOpen} 
+        onClose={handleCloseModal}
+        onCreate={handleCreateTask}
+        onUpdate={updateTask}
+        taskToEdit={editingTask}
+      />
+
+      <Snackbar open={!!errorMsg} autoHideDuration={4000} onClose={() => setErrorMsg(null)}>
+        <Alert severity="error" variant="filled" onClose={() => setErrorMsg(null)}>
+          {errorMsg}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
