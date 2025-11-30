@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Box, TextField, MenuItem, Button, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import type { Task, Role } from "../../types/types";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface TaskModalProps {
   open: boolean;
   onClose: () => void;
   onCreate: (title: string, desc: string, assignee: Role, storyPoints: number) => void;
   onUpdate: (id: string, partial: Partial<Task>) => void;
+  onDelete: (id: string) => void; 
   taskToEdit?: Task;
 }
 
-export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, onUpdate, taskToEdit }) => {
+export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, onUpdate, onDelete, taskToEdit }) => {
   const [title, setTitle] = useState(taskToEdit?.title || "");
   const [desc, setDesc] = useState(taskToEdit?.description || "");
   const [assignee, setAssignee] = useState<Role>(taskToEdit?.assignee || "Developer");
@@ -49,6 +51,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
     onClose();
   };
 
+  const handleDelete = () => {
+    if (taskToEdit && confirm("¿Estás seguro de borrar esta tarea permanentemente?")) {
+        onDelete(taskToEdit.id);
+        onClose();
+    }
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={{ p: 3, width: 360, bgcolor: "background.paper", borderRadius: 2, margin: "100px auto", boxShadow: 24 }}>
@@ -78,9 +87,22 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
           ))}
         </ToggleButtonGroup>
 
+        <Box display="flex" gap={2} justifyContent="space-between">
+            {isEditing && (
+                <Button 
+                    variant="outlined" 
+                    color="error" 
+                    onClick={handleDelete}
+                    sx={{ minWidth: '40px', px: 1 }} 
+                >
+                    <DeleteIcon />
+                </Button>
+            )}
+
         <Button variant="contained" onClick={submit} fullWidth disabled={!title.trim()}>
           {isEditing ? "Guardar Cambios" : "Crear Tarea"}
         </Button>
+        </Box>
       </Box>
     </Modal>
   );

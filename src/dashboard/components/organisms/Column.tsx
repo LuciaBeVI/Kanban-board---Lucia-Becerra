@@ -17,7 +17,6 @@ export const Column: React.FC<ColumnProps> = ({ status, tasks, onClickTask }) =>
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
-  {/* COLORS */}
   const getBackgroundColor = (status: Status) => {
     switch (status) {
       case "backlog": return isDark ? "#242433ff" : "#eae9f6ff"; 

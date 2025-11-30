@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Snackbar, Alert, Box, Typography, Container, Chip, Switch, FormControlLabel, IconButton, Tooltip } from "@mui/material";
+import { Snackbar, Alert, Box, Typography, Container, IconButton, Tooltip } from "@mui/material";
 import { useSensor, useSensors, PointerSensor, DndContext, DragEndEvent, closestCorners, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import { Task, Status, Role } from "../../types/types";
 import { useTasks } from "../../hooks/useTasks";
@@ -27,7 +27,7 @@ interface KanbanPageProps {
 }
 
 export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleTheme }) => {
-  const { tasks, archivedTasks, addTask, updateTask, moveTask, archiveCompleted, restoreTask } = useTasks();
+  const { tasks, archivedTasks, addTask, updateTask, moveTask, archiveCompleted, restoreTask, deleteTask } = useTasks();
 
   const [editingTask, setEditingTask] = useState<TaskEditState>(undefined); 
   const [currentUserRole, setCurrentUserRole] = useState<Role>("Developer");
@@ -225,6 +225,7 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
         onClose={handleCloseModal}
         onCreate={handleCreateTask}
         onUpdate={updateTask}
+        onDelete={deleteTask} 
         taskToEdit={editingTask}
       />
 

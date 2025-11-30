@@ -36,6 +36,10 @@ export const useTasks = () => {
     setAllTasks((prev) => prev.map(t => t.id === id ? { ...t, isArchived: false, status: 'qa' } : t));
   }, []);
 
+  const deleteTask = useCallback((id: string) => {
+    setAllTasks((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
   return { 
     tasks: allTasks.filter(t => !t.isArchived),
     archivedTasks: allTasks.filter(t => t.isArchived),
@@ -43,6 +47,7 @@ export const useTasks = () => {
     updateTask, 
     moveTask, 
     archiveCompleted,
-    restoreTask 
+    restoreTask,
+    deleteTask
   };
 };

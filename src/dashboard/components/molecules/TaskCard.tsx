@@ -87,8 +87,8 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
 
                 {task.storyPoints && (
                     <Box sx={{ 
-                        bgcolor: isDark ? "rgba(255, 255, 255, 0.15)" : "#dad9d9ff", 
-                        borderRadius: "50%", 
+                        bgcolor: isDark ? "rgba(255, 255, 255, 0.15)" : "#b8bedd", 
+                        borderRadius: "20%", 
                         width: 24, 
                         height: 24, 
                         display: "flex", 
