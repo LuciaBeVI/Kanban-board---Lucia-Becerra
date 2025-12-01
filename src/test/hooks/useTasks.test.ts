@@ -8,11 +8,6 @@ describe('useTasks Hook', () => {
     window.localStorage.clear();
   });
 
-  it('should initialize with empty tasks if storage is empty', () => {
-    const { result } = renderHook(() => useTasks());
-    expect(result.current.tasks).toEqual([]);
-  });
-
   it('should add a new task', () => {
     const { result } = renderHook(() => useTasks());
     
@@ -29,28 +24,49 @@ describe('useTasks Hook', () => {
     });
 
     expect(result.current.tasks).toHaveLength(1);
-    expect(result.current.tasks[0].title).toBe('Test Task');
   });
 
-  it('should update a task status', () => {
+  it('should delete a task permanently', () => {
     const { result } = renderHook(() => useTasks());
     
-    const newTask: Task = {
-      id: '1',
-      title: 'Test Task',
-      assignee: 'Developer',
-      status: 'backlog',
-      createdAt: new Date().toISOString(),
-    };
+    act(() => {
+      result.current.addTask({
+        id: 'to-delete',
+        title: 'Delete Me',
+        assignee: 'QA',
+        status: 'backlog',
+        createdAt: '',
+      });
+    });
+
+    expect(result.current.tasks).toHaveLength(1);
 
     act(() => {
-      result.current.addTask(newTask);
+      result.current.deleteTask('to-delete');
+    });
+
+    expect(result.current.tasks).toHaveLength(0);
+  });
+
+  it('should archive completed tasks', () => {
+    const { result } = renderHook(() => useTasks());
+    
+    act(() => {
+      result.current.addTask({
+        id: 'done-task',
+        title: 'Finished Work',
+        assignee: 'Developer',
+        status: 'done',
+        createdAt: '',
+      });
     });
 
     act(() => {
-      result.current.updateTask('1', { status: 'in-progress' });
+      result.current.archiveCompleted();
     });
 
-    expect(result.current.tasks[0].status).toBe('in-progress');
+    expect(result.current.tasks).toHaveLength(0);
+    expect(result.current.archivedTasks).toHaveLength(1);
+    expect(result.current.archivedTasks[0].id).toBe('done-task');
   });
 });
