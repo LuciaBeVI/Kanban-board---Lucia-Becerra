@@ -1,5 +1,16 @@
-import type { Task } from "../components/types";
+import { Task } from "../types/types";
 
-export const loadTasks = (): Task[] => JSON.parse(localStorage.getItem("tasks") || "[]");
+const STORAGE_KEY = "kanban_tasks_v1";
 
-export const saveTasks = (tasks: Task[]) => localStorage.setItem("tasks", JSON.stringify(tasks));
+export const loadTasks = (): Task[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveTasks = (tasks: Task[]) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+};

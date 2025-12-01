@@ -1,38 +1,46 @@
-import { useState } from "react";
-import { Box } from "@mui/material";
-import { Column } from "./dashboard/components/organisms/Column";
-import { TaskModal } from "./dashboard/components/molecules/TaskModal";
+import React, { useState, useMemo, useEffect } from "react";
+import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import { KanbanBoardPage } from "./dashboard/components/pages/KanbanBoardPage";
 
 
-interface Task {
-  title: string;
-  assignee: string;
-  status: "Backlog" | "In Progress" | "QA" | "Done";
-}
+const App = () => {
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    return (localStorage.getItem("theme") as "light" | "dark") || "light";
+  });
 
-function App() {
-  const columns = ["Backlog", "In Progress", "QA", "Done"];
-  const [tasks, setTasks] = useState<Task[]>([]);
+  useEffect(() => {
+    localStorage.setItem("theme", mode);
+  }, [mode]);
 
-  const handleAddTask = (task: { title: string; assignee: string }) => {
-    setTasks([...tasks, { ...task, status: "Backlog" }]);
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          ...(mode === "light"
+            ? {
+                background: { default: "#f4f3f7ff", paper: "#eeeef7ff" },
+                text: { primary: "#172b4d" },
+              }
+            : {
+                background: { default: "#1d2125", paper: "#282836ff" },
+                text: { primary: "#b6c2cf" },
+              }),
+        },
+      }),
+    [mode]
+  );
+
+  const toggleColorMode = () => {
+    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
   };
 
   return (
-    <Box sx={{ p: 4, background: "#f5f5f5", minHeight: "100vh" }}>
-      <TaskModal onAddTask={handleAddTask} />
-
-      <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-        {columns.map((col) => (
-          <Column
-            key={col}
-            name={col}
-            tasks={tasks.filter((t) => t.status === col)}
-          />
-        ))}
-      </Box>
-    </Box>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <KanbanBoardPage isDarkMode={mode === "dark"} toggleTheme={toggleColorMode} />
+    </ThemeProvider>
   );
-}
+};
 
 export default App;

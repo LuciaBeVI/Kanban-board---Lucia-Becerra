@@ -1,12 +1,13 @@
+import React from "react";
 import { Button } from "@mui/material";
 
-interface ButtonAtomProps {
+interface Props {
   text: string;
   onClick?: () => void;
 }
 
-export const ButtonAtom = ({ text, onClick }: ButtonAtomProps) => (
-  <Button variant="contained" onClick={onClick}>
+export const ButtonAtom = ({ text, onClick, ...props }: Props) => (
+  <Button variant="contained" onClick={onClick} {...props}>
     {text}
   </Button>
 );
