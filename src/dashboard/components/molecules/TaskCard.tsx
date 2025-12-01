@@ -71,7 +71,7 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
             variant="body2" 
             sx={{ mt: 0.5, color: isDark ? "#b0bec5" : "text.secondary" }}
         >
-          {task.description || "Sin descripción"}
+          {task.description || "No description provided"}
         </Typography>
         
         <Box display="flex" justifyContent="space-between" alignItems="end" mt={1}>

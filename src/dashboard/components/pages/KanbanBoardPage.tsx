@@ -102,7 +102,7 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
 
     if (activeTask.status !== newStatus) {
         if (!canMoveTask(currentUserRole, activeTask.status, newStatus)) {
-            setErrorMsg(`Acción bloqueada: ${currentUserRole} no puede mover de ${activeTask.status} a ${newStatus}.`);
+            setErrorMsg(`Action blocked: ${currentUserRole} cannot move from ${activeTask.status} to ${newStatus}.`);
             return;
         }
         updateTask(activeId, { status: newStatus });
@@ -112,7 +112,7 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
   };
 
   const handleArchiveSprint = () => {
-    if (confirm("¿Finalizar Sprint? Las tareas 'Done' se moverán al historial.")) {
+    if (confirm("End Sprint? This will archive all 'Done' tasks.")) {
       archiveCompleted();
     }
   };
@@ -122,18 +122,18 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
       
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
         <Typography variant="h4" fontWeight="bold" color="secondary">
-          Tablero Kanban
+          Kanban Board
         </Typography>
         
         <Box display="flex" alignItems="center" gap={3} sx={{ bgcolor: "background.paper", p: 1, px: 2, borderRadius: 3, boxShadow: 1 }}>
             
-            <Tooltip title="Cambiar Tema">
+            <Tooltip title="Toggle Theme">
               <IconButton onClick={toggleTheme} color="inherit">
                 {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Ver Historial de Tareas">
+            <Tooltip title="View History">
                 <IconButton onClick={() => setHistoryOpen(true)}>
                   <HistoryIcon />
                 </IconButton>
@@ -142,7 +142,7 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
             <Box sx={{ width: "1px", height: "24px", bgcolor: "divider" }} />
 
             <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="body2" color="text.secondary">Usuario:</Typography>
+                <Typography variant="body2" color="text.secondary">User:</Typography>
                 <Select
                     value={currentUserRole}
                     onChange={(e) => setCurrentUserRole(e.target.value as Role)}
@@ -171,13 +171,13 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
 
              <Box sx={{ width: "1px", height: "24px", bgcolor: "divider" }} />
 
-            <Tooltip title="Archivar tareas completadas (Finalizar Sprint)">
+            <Tooltip title="Archive Completed Tasks (End Sprint)">
                 <IconButton onClick={handleArchiveSprint} color="blueGrey" sx={{ border: "1px solid", borderColor: "blueGrey.main" }}>
                   <ArchiveIcon />
                 </IconButton>
             </Tooltip>
 
-            <ButtonAtom text="+ Nueva Tarea" onClick={() => setModalOpen(true)} color="info"/>
+            <ButtonAtom text="New Task" onClick={() => setModalOpen(true)} color="info"/>
         </Box>
       </Box>
 

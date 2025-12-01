@@ -17,20 +17,20 @@ export const Filters: React.FC<Props> = ({
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
       <FormControl fullWidth size="small">
-        <InputLabel>Filtrar por Rol</InputLabel>
+        <InputLabel>Filter by Role</InputLabel>
         <Select
           value={roleFilter}
           label="Filtrar por Rol"
           onChange={(e) => onRoleChange(e.target.value)}
         >
-          <MenuItem value="">Todos</MenuItem>
+          <MenuItem value="">All</MenuItem>
           <MenuItem value="Developer">Developer</MenuItem>
           <MenuItem value="QA">QA</MenuItem>
         </Select>
       </FormControl>
 
       <FormControl fullWidth size="small">
-        <InputLabel>Filtrar por Estado</InputLabel>
+        <InputLabel>Filter by Status</InputLabel>
         <Select
           value={statusFilter}
           label="Filtrar por Estado"

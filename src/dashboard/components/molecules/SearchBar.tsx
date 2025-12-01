@@ -10,7 +10,7 @@ export const SearchBar: React.FC<Props> = ({ value, onChange }) => {
   return (
     <TextField
       fullWidth
-      label="Buscar tarea..."
+      label="Search task..."
       variant="outlined"
       value={value}
       onChange={(e) => onChange(e.target.value)}

@@ -25,7 +25,7 @@ export const HistoryModal: React.FC<Props> = ({ open, onClose, archivedTasks, on
           overflowY: "auto"
       }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h6">Historial de Sprints (Archivado)</Typography>
+            <Typography variant="h6">Sprint History (Archived)</Typography>
             <IconButton onClick={onClose}><CloseIcon /></IconButton>
         </Box>
         
@@ -33,7 +33,7 @@ export const HistoryModal: React.FC<Props> = ({ open, onClose, archivedTasks, on
 
         {archivedTasks.length === 0 ? (
             <Typography variant="body2" color="text.secondary" align="center">
-                No hay tareas archivadas.
+                No archived tasks.
             </Typography>
         ) : (
             <List>
@@ -41,7 +41,7 @@ export const HistoryModal: React.FC<Props> = ({ open, onClose, archivedTasks, on
                     <ListItem 
                         key={task.id} 
                         secondaryAction={
-                            <IconButton edge="end" onClick={() => onRestore(task.id)} title="Restaurar al tablero">
+                            <IconButton edge="end" onClick={() => onRestore(task.id)} title="Restore to Board">
                                 <RestoreFromTrashIcon />
                             </IconButton>
                         }
@@ -56,7 +56,7 @@ export const HistoryModal: React.FC<Props> = ({ open, onClose, archivedTasks, on
                                     )}
                                 </Box>
                             }
-                            secondary={`Asignado a: ${task.assignee} • ${new Date(task.createdAt).toLocaleDateString()}`}
+                            secondary={`Assignee: ${task.assignee} • ${new Date(task.createdAt).toLocaleDateString()}`}
                         />
                     </ListItem>
                 ))}

@@ -52,7 +52,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
   };
 
   const handleDelete = () => {
-    if (taskToEdit && confirm("¿Estás seguro de borrar esta tarea permanentemente?")) {
+    if (taskToEdit && confirm("Are you sure you want to delete this task permanently?")) {
         onDelete(taskToEdit.id);
         onClose();
     }
@@ -62,18 +62,18 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
     <Modal open={open} onClose={onClose}>
       <Box sx={{ p: 3, width: 360, bgcolor: "background.paper", borderRadius: 2, margin: "100px auto", boxShadow: 24 }}>
         <Typography variant="h5" sx={{ mb: 3 }}>
-            {isEditing ? `Editar Tarea: ${taskToEdit?.title}` : "Crear Nueva Tarea"}
+            {isEditing ? `Edit Task: ${taskToEdit?.title}` : "Create New Task"}
         </Typography>
 
-        <TextField label="Título" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
-        <TextField label="Descripción" multiline rows={3} fullWidth value={desc} onChange={(e) => setDesc(e.target.value)} sx={{ mb: 2 }} />
+        <TextField label="Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} sx={{ mb: 2 }} />
+        <TextField label="Description" multiline rows={3} fullWidth value={desc} onChange={(e) => setDesc(e.target.value)} sx={{ mb: 2 }} />
         
-        <TextField select label="Asignado a" fullWidth value={assignee} onChange={(e) => setAssignee(e.target.value as Role)} sx={{ mb: 2 }}>
+        <TextField select label="Assignee" fullWidth value={assignee} onChange={(e) => setAssignee(e.target.value as Role)} sx={{ mb: 2 }}>
           <MenuItem value="Developer">Developer</MenuItem>
           <MenuItem value="QA">QA</MenuItem>
         </TextField>
         
-        <Typography variant="caption" display="block" sx={{ mb: 1 }}>Puntos de Historia (Complejidad)</Typography>
+        <Typography variant="caption" display="block" sx={{ mb: 1 }}>Story Points (Complexity)</Typography>
         <ToggleButtonGroup
           value={points}
           exclusive
@@ -100,7 +100,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreate, o
             )}
 
         <Button variant="contained" onClick={submit} fullWidth disabled={!title.trim()}>
-          {isEditing ? "Guardar Cambios" : "Crear Tarea"}
+          {isEditing ? "Save Changes" : "Create Task"}
         </Button>
         </Box>
       </Box>

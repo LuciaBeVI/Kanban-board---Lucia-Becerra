@@ -59,7 +59,7 @@ export const Column: React.FC<ColumnProps> = ({ status, tasks, onClickTask }) =>
         
         {tasks.length === 0 && (
           <Typography variant="caption" sx={{ color: "text.disabled", textAlign: "center", mt: 2 }}>
-            Arrastra tareas aquí
+            Drop tasks here
           </Typography>
         )}
       </Paper>
