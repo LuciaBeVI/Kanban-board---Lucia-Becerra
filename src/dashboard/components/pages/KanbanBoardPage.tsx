@@ -54,14 +54,22 @@ export const KanbanBoardPage: React.FC<KanbanPageProps> = ({ isDarkMode, toggleT
     setModalOpen(true);
   };
 
+  const generateReadableId = (): string => {
+      const lastId = parseInt(localStorage.getItem("kanban_seq_counter") || "0");
+      const nextId = lastId + 1;
+      localStorage.setItem("kanban_seq_counter", nextId.toString());
+      return `KAN-${nextId}`;
+  };
+
   const handleCreateTask = (title: string, desc: string, assignee: Role, storyPoints: number) => {
     const newTask: Task = {
         id: crypto.randomUUID(),
+        readableId: generateReadableId(),
         title,
         description: desc,
         assignee,
         status: "backlog",
-        storyPoints, 
+        storyPoints,
         createdAt: new Date().toISOString(),
       };
       addTask(newTask);

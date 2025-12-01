@@ -46,6 +46,7 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
           {...listeners} 
           sx={{ 
               display: 'flex', 
+              flexDirection: 'column',
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               p: 1.5,
@@ -55,6 +56,18 @@ export const TaskCard = ({ task, onClick }: { task: Task, onClick: (task: Task) 
               borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
           }}
       >
+          <Typography 
+              variant="caption" 
+              sx={{ 
+                  color: isDark ? "#90caf9" : "primary.main", 
+                  fontWeight: "bold", 
+                  fontSize: "0.7rem",
+                  mb: 0.5 
+              }}
+          >
+              {task.readableId || "TASK"}
+          </Typography>
+
           <Typography 
               variant="subtitle1" 
               sx={{ color: isDark ? "#e3f2fd" : "text.primary", fontWeight: 500 }}

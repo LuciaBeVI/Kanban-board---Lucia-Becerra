@@ -3,6 +3,7 @@ export type Role = "Developer" | "QA";
 
 export interface Task {
   id: string;
+  readableId: string;
   title: string;
   description?: string;
   assignee: Role;
